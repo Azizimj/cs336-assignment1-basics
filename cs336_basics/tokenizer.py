@@ -61,8 +61,9 @@ def find_chunk_boundaries(
 PAT = r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
 def pre_tokenize_a_chunk(chunk: str, special_tokens: list[str],) -> list[tuple]:
   tokens = []
-  for c in re.split('(' + re.escape('|').join(special_tokens) + ')', chunk):
-    if c in special_tokens:
+  pattern = '(' + '|'.join(re.escape(s) for s in special_tokens) + ')'
+  for c in re.split(pattern, chunk):
+    if not c or (c in special_tokens):
       continue
     for x in re.finditer(PAT, c):
       tokens.append(tuple(bytes([b]) for b in x.group(0).encode('utf-8')))
